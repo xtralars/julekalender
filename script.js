@@ -117,13 +117,13 @@ function checkGuess(event) {
         // Reveal Hint 1 after 5 incorrect guesses
         if (incorrectGuessCount === 5) {
             hintBtn1.classList.remove('hidden');
-            message.textContent += ` Hint 1 is now available!`;
+            message.textContent += ` Prøv et hint!`;
         }
 
         // Reveal Hint 2 after 10 incorrect guesses
         if (incorrectGuessCount === 10) {
             hintBtn2.classList.remove('hidden');
-            message.textContent += ` Hint 2 is now available!`;
+            message.textContent += ` Prøv et annet hint!`;
         }
     }
     document.querySelector('#guessInput').value = '';
@@ -133,7 +133,8 @@ function revealAnswerToPage() {
     const videoContainer = document.getElementById("revealAnswer");
     if (revealAnswerContent) {
         // This is fine for embedding YouTube/Vimeo links
-        videoContainer.innerHTML = `<iframe width="560" height="315" src="${revealAnswerContent}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        videoContainer.innerHTML = revealAnswerContent;
+
         videoContainer.classList.remove('hidden'); // Ensure it's visible
     } else {
         videoContainer.classList.add('hidden');
@@ -142,36 +143,35 @@ function revealAnswerToPage() {
 
 // Event listeners for guessing
 const guessButton = document.querySelector("#submitGuess");
+const guessInput = document.getElementById('guessInput');
 guessButton.addEventListener("click", checkGuess);
 
 // Call the function to update content for the current day
 updateContentForCurrentDay();
 
-// Function to toggle hint visibility 
+// Function to toggle hint visibility and replace the button
 function toggleHint(hintButtonId, hintTextId) {
     const hintButton = document.getElementById(hintButtonId);
     const hintText = document.getElementById(hintTextId);
-    const message = document.getElementById('message');
-
-    // Only proceed if the hint hasn't been revealed yet
+    
+    // Check if the hint text is currently hidden (meaning the button is still visible)
     if (hintText.classList.contains('hidden')) {
-        // Reveal the hint text
+        
+        // 1. Reveal the hint text
         hintText.classList.remove('hidden');
         
-        // Disable the button to prevent multiple reveals
-        hintButton.disabled = true;
+        // 2. Insert the hint text *before* the button
+        // This ensures the element is in the correct place in the parent container
+        hintButton.parentNode.insertBefore(hintText, hintButton);
 
-        // Update the message and button text
-        message.textContent = `Hint used! The hint is now visible.`;
-        hintButton.textContent = `Hint Used`;
-        
-    } else {
-        // This case should ideally not happen due to button disabling
-        message.textContent = "This hint has already been revealed.";
-    }
+        // 3. Remove the button from the DOM
+        hintButton.parentNode.removeChild(hintButton);
+
+    } 
+    // We don't need an 'else' block, as the button is gone once the hint is used.
 }
 
-// Event Listeners for Hint Buttons (Keep these as they were)
+// Event Listeners for Hint Buttons (KEEP THESE)
 const hintBtn1 = document.getElementById("hintBtn1");
 const hintBtn2 = document.getElementById("hintBtn2");
 
@@ -181,4 +181,16 @@ hintBtn1.addEventListener("click", () => {
 
 hintBtn2.addEventListener("click", () => {
     toggleHint("hintBtn2", "hintText2");
+});
+
+// Listen for key presses on the input field
+guessInput.addEventListener('keyup', function(event) {
+    // Check if the key pressed is the 'Enter' key (key code 13 or key name 'Enter')
+    if (event.key === 'Enter') {
+        // Prevent the default action (which might be a page reload if it were a form)
+        event.preventDefault(); 
+        
+        // Programmatically trigger a click on the submit button
+        document.getElementById('submitGuess').click();
+    }
 });
