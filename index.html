@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Musikkjulekalender</title>
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>Musikkjulekalender</h1>
+        </header>
+        <main>
+            <div class="audio-display">
+                <audio controls id="song">
+                    <source id="audioSource" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <div class="content-display">
+                <h2 id="opgHead">Luke 1</h2>
+                <p id="opgText">Oppgave tekst</p>
+            </div>
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input type="text" id="guessInput" placeholder="Enter your guess">
+                    <ul id="suggestions" class="suggestions-list"></ul>
+                </div>
+                <button id="submitGuess">Submit</button>
+            </div>
+            <div class="hints">
+                <button id="hintBtn1">Hint 1</button>
+                <p id="hintText1" class="hidden"></p>
+                <button id="hintBtn2">Hint 2</button>
+                <p id="hintText2" class="hidden"></p>
+            </div>
+            <div class="message" id="message"></div>
+            <div id="revealAnswer" class="hidden"></div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
