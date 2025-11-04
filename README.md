@@ -1,1 +1,1 @@
-xtralars.github.com/julekalender
+xtralars.github.io/julekalender
