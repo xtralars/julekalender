@@ -21,6 +21,7 @@ const storage = getStorage(app);
 let correctAnswer = ''; // Initialize the answer
 // let userPoints = 3; **remove userpoints**//
 let revealAnswerContent = null;
+let incorrectGuessCount = 0;
 
 // Function to update the content for the current day
 async function updateContentForCurrentDay() {
@@ -34,14 +35,14 @@ async function updateContentForCurrentDay() {
 
     try {
         // Construct the Firebase path: e.g., days/day4
-        const dayRef = ref(db, `days/day${currentDay}`);
+        const dayRef = ref(db, `days/Day${currentDay}`);
         const snapshot = await get(dayRef);
         
         if (snapshot.exists()) {
             const dayData = snapshot.val();
             
             // **1. Set the correct answer and quiz text**
-            correctAnswer = dayData.answer; document.getElementById("opgText").textContent = dayData.quizText || "No quiz text available for today.";
+            correctAnswer = dayData.correctAnswer; document.getElementById("opgText").textContent = dayData.quizText || "No quiz text available for today.";
             
             // **2. Set the hint texts** (using correct HTML IDs: hintText1, hintText2)
             document.getElementById("hintText1").textContent = dayData.hints?.hint1 || "No Hint 1 available.";
@@ -88,20 +89,42 @@ function checkGuess(event) {
     const inputGuess = document.querySelector('#guessInput').value.trim().toLowerCase();
     const message = document.querySelector('#message');
 
-    // **IMPORTANT:** Check if correctAnswer has been set
     if (!correctAnswer) {
         message.textContent = 'Content is still loading. Please wait.';
         return;
     }
 
     if (inputGuess === correctAnswer.toLowerCase()) {
+        // --- CORRECT GUESS ---
         message.textContent = 'Gratulerer! ' + correctAnswer + ' er riktig.';
         triggerConfetti();
-        // **Reveal the answer content after a correct guess**
         revealAnswerToPage();
+        
+        // Reset counter after correct answer
+        incorrectGuessCount = 0; 
+        
     } else {
+        // --- INCORRECT GUESS ---
         message.textContent = inputGuess + ' er feil. Prøv igjen.';
-        // Optionally decrease userPoints here
+        
+        // 1. Increment the counter
+        incorrectGuessCount++;
+
+        // 2. Check the counter against the thresholds
+        const hintBtn1 = document.getElementById("hintBtn1");
+        const hintBtn2 = document.getElementById("hintBtn2");
+        
+        // Reveal Hint 1 after 5 incorrect guesses
+        if (incorrectGuessCount === 5) {
+            hintBtn1.classList.remove('hidden');
+            message.textContent += ` Hint 1 is now available!`;
+        }
+
+        // Reveal Hint 2 after 10 incorrect guesses
+        if (incorrectGuessCount === 10) {
+            hintBtn2.classList.remove('hidden');
+            message.textContent += ` Hint 2 is now available!`;
+        }
     }
     document.querySelector('#guessInput').value = '';
 }
